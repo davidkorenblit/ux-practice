@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מערכת MAST - ניהול חילופי מחזיקים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- App Header & Role Switcher -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo-badge">MAST</div>
+      <div class="brand-text">
+        <h1>תאגיד מים - מערכת חילופי מחזיקים</h1>
+        <span class="sub-brand">פורטל דיגיטלי אחוד</span>
+      </div>
+    </div>
+
+    <!-- Role Switcher Tabs -->
+    <nav class="role-switcher" aria-label="מעבר בין תפקידים">
+      <button class="role-tab active" data-view="noa" id="tab-noa">
+        <span class="tab-icon">👤</span>
+        <span class="tab-label">1. המסע של נועה (אזרח)</span>
+      </button>
+      <button class="role-tab" data-view="agent" id="tab-agent">
+        <span class="tab-icon">🎧</span>
+        <span class="tab-label">2. סביבת הנציג (Back-Office)</span>
+      </button>
+      <button class="role-tab" data-view="admin" id="tab-admin">
+        <span class="tab-icon">🛡️</span>
+        <span class="tab-label">3. מרכז שליטה מנהל (Ops Center)</span>
+      </button>
+    </nav>
+
+    <div class="header-status">
+      <span class="pulse-dot"></span>
+      <span id="active-agent-display">נציג מחובר: דניאל ר.</span>
+    </div>
+  </header>
+
+  <!-- Main Application Container -->
+  <main class="app-container">
+
+    <!-- ========================================================
+         VIEW 1: המסע של נועה (חווית אזרח / דייר)
+         ======================================================== -->
+    <section id="view-noa" class="view-section active">
+      <div class="noa-wrapper">
+
+        <!-- Stepper Navigation -->
+        <div class="wizard-stepper" id="noa-stepper">
+          <div class="step-indicator active" data-step="0">
+            <div class="circle">0</div>
+            <span>הכנה</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-indicator" data-step="1">
+            <div class="circle">1</div>
+            <span>זיהוי ותפקיד</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-indicator" data-step="2">
+            <div class="circle">2</div>
+            <span>פרטי הנכס</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-indicator" data-step="3">
+            <div class="circle">3</div>
+            <span>מונה ודיירים</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-indicator" data-step="4">
+            <div class="circle">4</div>
+            <span>סיכום וחתימה</span>
+          </div>
+        </div>
+
+        <!-- Wizard Steps Container -->
+        <div class="wizard-card" id="wizard-container">
+
+          <!-- Step 0: Welcome & Preparation -->
+          <div class="wizard-step active" id="noa-step-0">
+            <div class="welcome-hero">
+              <div class="hero-icon">🚀</div>
+              <h2>ברוכים הבאים להחלפת משלמים בקליק!</h2>
+              <p class="hero-desc">נועה כאן כדי ללוות אותך צעד אחר צעד. התהליך לוקח כ-4 דקות בלבד.</p>
+            </div>
+
+            <div class="prep-card">
+              <h3>📋 מה כדאי להכין מראש?</h3>
+              <ul class="checklist">
+                <li><span class="check-icon">✓</span> תעודת זהות (כולל ספח פתוח)</li>
+                <li><span class="check-icon">✓</span> צילום ברור של מונה המים העדכני</li>
+                <li><span class="check-icon">✓</span> חוזה שכירות או חוזה מכר חתום</li>
+              </ul>
+            </div>
+
+            <div class="role-selection-box">
+              <h3>מי מגיש את הבקשה כעת?</h3>
+              <div class="role-grid">
+                <label class="role-card selected">
+                  <input type="radio" name="applicantRole" value="incoming" checked>
+                  <span class="card-icon">🏠</span>
+                  <span class="card-title">אני הדייר הנכנס</span>
+                  <span class="card-hint">נכנס לנכס שכור או בבעלות חדשה</span>
+                </label>
+                <label class="role-card">
+                  <input type="radio" name="applicantRole" value="outgoing">
+                  <span class="card-icon">👋</span>
+                  <span class="card-title">אני הדייר היוצא</span>
+                  <span class="card-hint">מסיים חוזה שכירות ומפנה את הנכס</span>
+                </label>
+                <label class="role-card">
+                  <input type="radio" name="applicantRole" value="attorney">
+                  <span class="card-icon">⚖️</span>
+                  <span class="card-title">מיופה כוח / עורך דין</span>
+                  <span class="card-hint">פועל בשם צד ג' עם ייפוי כוח חתום</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="step-footer">
+              <button class="btn btn-primary btn-next" onclick="NoaWizard.goToStep(1)">התחל בתהליך 👈</button>
+            </div>
+          </div>
+
+          <!-- Step 1: Identification & Role -->
+          <div class="wizard-step" id="noa-step-1">
+            <div class="step-header">
+              <h2>שלב 1: פרטי זיהוי והגדרת התפקיד 👤</h2>
+              <p>אימות זהות מול תאגיד המים</p>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="id-fullname">שם מלא <span class="required">*</span></label>
+                <input type="text" id="id-fullname" value="נועה לוי" placeholder="שם פרטי ומשפחה">
+              </div>
+
+              <div class="form-group">
+                <label for="id-israeliId">מספר תעודת זהות (כולל ספרת ביקורת) <span class="required">*</span></label>
+                <input type="text" id="id-israeliId" value="039847125" placeholder="9 ספרות" maxlength="9">
+                <span class="input-helper" id="id-validation-hint"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="id-phone">טלפון נייד לאימות <span class="required">*</span></label>
+                <div class="input-action-group">
+                  <input type="tel" id="id-phone" value="052-4412389" placeholder="050-0000000">
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-send-otp" onclick="NoaWizard.sendOtp()">שלח קוד SMS</button>
+                </div>
+              </div>
+
+              <div class="form-group" id="otp-container" style="display:none;">
+                <label for="id-otp">קוד אימות שנשלח לנייד <span class="required">*</span></label>
+                <div class="input-action-group">
+                  <input type="text" id="id-otp" placeholder="הזן 4 ספרות (דמו: 1234)" maxlength="4">
+                  <button type="button" class="btn btn-success btn-sm" onclick="NoaWizard.verifyOtp()">אמת קוד</button>
+                </div>
+                <span class="input-helper text-success" id="otp-status-msg"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="id-email">כתובת דואר אלקטרוני <span class="required">*</span></label>
+                <input type="email" id="id-email" value="noa.levy@example.com" placeholder="name@domain.com">
+              </div>
+
+              <div class="form-group">
+                <label>סוג הישות המשפטית</label>
+                <div class="radio-inline">
+                  <label><input type="radio" name="entityType" value="private" checked onchange="NoaWizard.toggleCompanyFields(false)"> אדם פרטי</label>
+                  <label><input type="radio" name="entityType" value="company" onchange="NoaWizard.toggleCompanyFields(true)"> חברה (ח"פ)</label>
+                </div>
+              </div>
+
+              <div class="form-group" id="company-fields" style="display:none;">
+                <label for="id-company-name">שם החברה ומספר ח"פ <span class="required">*</span></label>
+                <input type="text" id="id-company-name" placeholder="שם חברה בע''מ / ח''פ 51...">
+              </div>
+
+              <!-- Power of Attorney Upload (Condition: if attorney role selected) -->
+              <div class="form-group full-width" id="poa-upload-group" style="display:none;">
+                <div class="alert alert-warning">
+                  <span>⚖️ זוהתה בקשה על ידי מיופה כוח: חובה להעלות ייפוי כוח נוטריוני חתום וצילום ת"ז מייפה הכוח.</span>
+                </div>
+                <div class="file-dropzone" onclick="NoaWizard.simulateFileUpload('poa')">
+                  <div class="drop-icon">📎</div>
+                  <div class="drop-text">
+                    <strong>לחץ להעלאת ייפוי כוח חתום + ת"ז מייפה כוח</strong>
+                    <span class="file-selected-text" id="poa-file-status">קובץ: PowerOfAttorney_Signed.pdf (1.8 MB)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ID Document Upload -->
+              <div class="form-group full-width">
+                <label>צילום תעודת זהות + ספח פתוח <span class="required">*</span></label>
+                <div class="file-dropzone" onclick="NoaWizard.simulateFileUpload('tz')">
+                  <div class="drop-icon">🪪</div>
+                  <div class="drop-text">
+                    <strong>לחץ להעלאת צילום ת"ז וספח (PDF/JPG)</strong>
+                    <span class="file-selected-text" id="tz-file-status">קובץ: ID_Noa_Levy.jpg (צורף בהצלחה)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-footer">
+              <button class="btn btn-secondary" onclick="NoaWizard.goToStep(0)">חזור</button>
+              <button class="btn btn-primary" onclick="NoaWizard.validateStep1()">המשך לפרטי הנכס 👈</button>
+            </div>
+          </div>
+
+          <!-- Step 2: Property Details -->
+          <div class="wizard-step" id="noa-step-2">
+            <div class="step-header">
+              <h2>שלב 2: פרטי הנכס ותאריך ההחלפה 📍</h2>
+              <p>קישור הכתובת הפיזית למערכות ה-GIS והגבייה</p>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="prop-city">עיר <span class="required">*</span></label>
+                <select id="prop-city">
+                  <option value="הרצליה" selected>הרצליה</option>
+                  <option value="רמת השרון">רמת השרון</option>
+                  <option value="תל אביב-יפו">תל אביב-יפו</option>
+                  <option value="רעננה">רעננה</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="prop-street">רחוב ומספר בית <span class="required">*</span></label>
+                <input type="text" id="prop-street" value="סוקולוב 42" placeholder="שם רחוב ומספר בית">
+              </div>
+
+              <div class="form-group">
+                <label for="prop-apartment">מספר דירה</label>
+                <input type="text" id="prop-apartment" value="7" placeholder="מספר דירה (בבית משותף)">
+              </div>
+
+              <div class="form-group">
+                <label for="prop-consumer-id">מספר נכס / צרכן (אופציונלי אך מומלץ)</label>
+                <input type="text" id="prop-consumer-id" value="9842103" placeholder="מופיע בראש חשבון המים (7 ספרות)">
+                <small class="input-hint">💡 מופיע בחשבון המים התקופתי של הנכס</small>
+              </div>
+
+              <div class="form-group">
+                <label for="prop-date">תאריך כניסה / החלפת משלמים <span class="required">*</span></label>
+                <input type="date" id="prop-date" value="2026-10-01">
+              </div>
+
+              <!-- Contract Upload -->
+              <div class="form-group full-width">
+                <label>העלאת חוזה שכירות / חוזה מכר חתום <span class="required">*</span></label>
+                <div class="file-dropzone" onclick="NoaWizard.simulateFileUpload('contract')">
+                  <div class="drop-icon">📄</div>
+                  <div class="drop-text">
+                    <strong>לחץ להעלאת חוזה חתום (עמוד ראשון ואחרון עם חתימות)</strong>
+                    <span class="file-selected-text" id="contract-file-status">קובץ: Rental_Agreement_Sokolov42.pdf (צורף)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-footer">
+              <button class="btn btn-secondary" onclick="NoaWizard.goToStep(1)">חזור</button>
+              <button class="btn btn-primary" onclick="NoaWizard.validateStep2()">המשך לנתוני מונה מים 👈</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Water Meter & Occupants -->
+          <div class="wizard-step" id="noa-step-3">
+            <div class="step-header">
+              <h2>שלב 3: נתוני המים והרכב הדיירים 💧</h2>
+              <p>קביעת קריאת המונה ותעריף קצבת הנפשות</p>
+            </div>
+
+            <div class="meter-explanation-box">
+              <div class="meter-icon">⏱️</div>
+              <div class="meter-info">
+                <strong>איך קוראים את מונה המים?</strong>
+                <p>רשום אך ורק את הספרות השחורות משמאל לימין. <u>אין לרשום</u> את הספרות האדומות או גלגלי הספרות הקטנים.</p>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="meter-reading">קריאת מונה נוכחית (ספרות שחורות בלבד) <span class="required">*</span></label>
+                <input type="number" id="meter-reading" value="482" placeholder="לדוגמה: 482">
+              </div>
+
+              <div class="form-group">
+                <label for="meter-number">מספר כרטיס מד מים (מוטבע על המונה)</label>
+                <input type="text" id="meter-number" value="WM-981240" placeholder="לדוגמה: WM-981240">
+              </div>
+
+              <!-- Meter Photo Upload -->
+              <div class="form-group full-width">
+                <label>צילום ברור של מונה המים <span class="required">*</span></label>
+                <div class="file-dropzone" onclick="NoaWizard.simulateFileUpload('meter')">
+                  <div class="drop-icon">📸</div>
+                  <div class="drop-text">
+                    <strong>לחץ להעלאת תמונת מונה המים (JPG/PNG)</strong>
+                    <span class="file-selected-text" id="meter-file-status">קובץ: WaterMeter_Photo_482.jpg (צורף)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="occupants-count">מספר נפשות קבועות בנכס <span class="required">*</span></label>
+                <select id="occupants-count" onchange="NoaWizard.handleOccupantsChange(this.value)">
+                  <option value="1">נפש 1</option>
+                  <option value="2" selected>2 נפשות</option>
+                  <option value="3">3 נפשות</option>
+                  <option value="4">4 נפשות</option>
+                  <option value="5">5 נפשות ומעלה</option>
+                </select>
+                <small class="input-hint">משפיע ישירות על כמות המים בתעריף מוזל</small>
+              </div>
+            </div>
+
+            <!-- Dynamic Table for Adult Occupants -->
+            <div class="adults-table-section">
+              <div class="section-title-row">
+                <h4>פירוט דיירים בגירים נוספים מעל גיל 18</h4>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="NoaWizard.addOccupantRow()">+ הוסף דייר</button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table" id="adults-table">
+                  <thead>
+                    <tr>
+                      <th>שם מלא</th>
+                      <th>מספר תעודת זהות</th>
+                      <th>הערות / קשר</th>
+                      <th>הסרה</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="text" value="יונתן לוי" class="cell-input" placeholder="שם מלא"></td>
+                      <td><input type="text" value="038291487" class="cell-input" placeholder="9 ספרות"></td>
+                      <td><input type="text" value="בן זוג" class="cell-input" placeholder="קרבה"></td>
+                      <td><button type="button" class="btn-icon text-danger" onclick="NoaWizard.removeOccupantRow(this)">🗑️</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="step-footer">
+              <button class="btn btn-secondary" onclick="NoaWizard.goToStep(2)">חזור</button>
+              <button class="btn btn-primary" onclick="NoaWizard.validateStep3()">המשך לסיכום וחתימה 👈</button>
+            </div>
+          </div>
+
+          <!-- Step 4: Summary, Declaration & Digital Signature -->
+          <div class="wizard-step" id="noa-step-4">
+            <div class="step-header">
+              <h2>שלב 4: סיכום נתונים, הצהרה וחתימה ✅</h2>
+              <p>בדיקה אחרונה של הפרטים לפני שיגור הבקשה לתאגיד</p>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards-grid">
+              <div class="summary-card">
+                <div class="card-header-bar">
+                  <span>👤 פרטי המשלם</span>
+                  <button class="btn-link" onclick="NoaWizard.goToStep(1)">עריכה ✏️</button>
+                </div>
+                <div class="summary-content" id="sum-identity">
+                  <div><strong>שם:</strong> <span id="sum-name">נועה לוי</span></div>
+                  <div><strong>ת"ז:</strong> <span id="sum-id">039847125</span></div>
+                  <div><strong>טלפון:</strong> <span id="sum-phone">052-4412389</span></div>
+                  <div><strong>תפקיד:</strong> <span id="sum-role">דייר נכנס</span></div>
+                </div>
+              </div>
+
+              <div class="summary-card">
+                <div class="card-header-bar">
+                  <span>📍 פרטי הנכס</span>
+                  <button class="btn-link" onclick="NoaWizard.goToStep(2)">עריכה ✏️</button>
+                </div>
+                <div class="summary-content" id="sum-property">
+                  <div><strong>כתובת:</strong> <span id="sum-address">סוקולוב 42, הרצליה (דירה 7)</span></div>
+                  <div><strong>מספר נכס:</strong> <span id="sum-consumer">9842103</span></div>
+                  <div><strong>תאריך כניסה:</strong> <span id="sum-date">01/10/2026</span></div>
+                </div>
+              </div>
+
+              <div class="summary-card">
+                <div class="card-header-bar">
+                  <span>💧 נתוני מונה ונפשות</span>
+                  <button class="btn-link" onclick="NoaWizard.goToStep(3)">עריכה ✏️</button>
+                </div>
+                <div class="summary-content" id="sum-meter">
+                  <div><strong>קריאת מונה:</strong> <span id="sum-reading">482 מ"ק</span></div>
+                  <div><strong>מספר נפשות:</strong> <span id="sum-occupants">2 נפשות</span></div>
+                  <div><strong>מסמכים שצורפו:</strong> <span class="text-success">חוזה, צילום ת"ז, צילום מונה</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Legal Declaration Checkbox -->
+            <div class="declaration-box">
+              <label class="custom-checkbox">
+                <input type="checkbox" id="legal-declaration">
+                <span class="checkmark"></span>
+                <span class="declaration-text">
+                  אני מצהיר/ה בזאת כי כל הנתונים שנמסרו בטופס זה, לרבות קריאת המונה והמסמכים המצורפים, הינם נכונים, מלאים ומדויקים. ידוע לי כי מסירת מידע כוזב מהווה עבירה על החוק.
+                </span>
+              </label>
+            </div>
+
+            <!-- Canvas Digital Signature -->
+            <div class="signature-section">
+              <div class="sig-header">
+                <label><strong>חתימה דיגיטלית:</strong> חתום באמצעות העכבר או מגע המסך <span class="required">*</span></label>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="NoaWizard.clearSignature()">נקה חתימה 🔄</button>
+              </div>
+              <div class="canvas-wrapper">
+                <canvas id="signature-canvas" width="600" height="150"></canvas>
+                <div class="canvas-hint" id="canvas-hint">חתום כאן בכתב יד</div>
+              </div>
+            </div>
+
+            <div class="step-footer">
+              <button class="btn btn-secondary" onclick="NoaWizard.goToStep(3)">חזור</button>
+              <button class="btn btn-primary btn-submit" id="btn-submit-application" onclick="NoaWizard.submitApplication()">
+                שלח בקשה לתאגיד 🚀
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /#wizard-container -->
+
+        <!-- Screen 6: Tracking & Missing Documents Center (shown after submission) -->
+        <div class="tracking-card" id="noa-tracking-screen" style="display:none;">
+          <div class="tracking-hero">
+            <div class="hero-badge">בקשה נקלטה בהצלחה 🎉</div>
+            <h2>מרכז מעקב אישי - פנייה מס' <span id="track-request-id">10293</span></h2>
+            <p class="text-muted">הבקשה שלך מנוטרת ומטופלת ע"י צוות תאגיד המים</p>
+          </div>
+
+          <!-- Stepper for Request Progress -->
+          <div class="tracking-stepper">
+            <div class="track-step done">
+              <div class="t-icon">✔️</div>
+              <span class="t-title">הבקשה התקבלה</span>
+              <span class="t-time">היום, 10:15</span>
+            </div>
+            <div class="track-line active"></div>
+            <div class="track-step current" id="track-step-agent">
+              <div class="t-icon">🔍</div>
+              <span class="t-title">בבדיקת נציג</span>
+              <span class="t-time" id="track-agent-status">בתהליך בדיקה</span>
+            </div>
+            <div class="track-line"></div>
+            <div class="track-step" id="track-step-approved">
+              <div class="t-icon">🖋️</div>
+              <span class="t-title">אישור סופי ועדכון</span>
+              <span class="t-time">עד 1 ימי עסקים</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Alert Banner for Missing Documents (Triggered by Agent!) -->
+          <div class="missing-docs-alert" id="noa-missing-alert" style="display:none;">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-body">
+              <h4>נדרשת השלמת מסמכים להמשך הטיפול!</h4>
+              <p id="noa-missing-reason">נציג השירות ציין כי צילום תעודת הזהות אינו קריא. אנא העלה מחדש צילום ברור.</p>
+              <button class="btn btn-warning btn-sm" onclick="NoaWizard.openResubmitModal()">העלה מסמך חסר כעת 📤</button>
+            </div>
+          </div>
+
+          <!-- Contact & Shortcuts -->
+          <div class="tracking-footer-actions">
+            <button class="btn btn-secondary" onclick="NoaWizard.restartFlow()">הגש בקשה חדשה</button>
+            <a href="https://api.whatsapp.com/send?phone=972500000000" target="_blank" class="btn btn-outline-whatsapp">
+              💬 צ'אט מהיר עם נציג ב-WhatsApp
+            </a>
+          </div>
+        </div>
+
+      </div><!-- /.noa-wrapper -->
+    </section>
+
+
+    <!-- ========================================================
+         VIEW 2: סביבת עבודה לנציג שירות (Back-Office)
+         ======================================================== -->
+    <section id="view-agent" class="view-section">
+      <div class="agent-workspace">
+
+        <!-- Top Sticky Header: Context, Identity & SLA Timer -->
+        <div class="agent-topbar">
+          <div class="context-customer">
+            <span class="vip-badge" id="agent-cust-vip">לקוח חדש</span>
+            <div class="customer-name-id">
+              <strong id="agent-cust-name">נועה לוי</strong>
+              <span id="agent-cust-id">ת"ז: 039847125</span>
+            </div>
+          </div>
+
+          <div class="context-request-info">
+            <div class="meta-item">
+              <span class="label">מספר בקשה:</span>
+              <span class="value" id="agent-req-id">#10293</span>
+            </div>
+            <div class="meta-item">
+              <span class="label">פעולה:</span>
+              <span class="value">חילופי מחזיקים</span>
+            </div>
+            <div class="meta-item">
+              <span class="label">מועד הגשה:</span>
+              <span class="value" id="agent-req-time">22/09/2026, 11:20</span>
+            </div>
+          </div>
+
+          <!-- Dynamic SLA Indicator -->
+          <div class="sla-indicator-box">
+            <div class="sla-header">
+              <span>זמן נותר ל-SLA:</span>
+              <strong class="sla-timer" id="agent-sla-timer">02:45:10</strong>
+            </div>
+            <div class="sla-bar-bg">
+              <div class="sla-bar-fill" id="agent-sla-fill" style="width: 75%;"></div>
+            </div>
+          </div>
+
+          <button class="btn btn-secondary btn-sm" onclick="App.openAuditModal()">📋 היסטוריית פעולות (Audit)</button>
+        </div>
+
+        <!-- Sticky Bar: System Errors & Deviations -->
+        <div class="sticky-exceptions-bar" id="agent-sticky-bar">
+          <div class="bar-icon">⚠️</div>
+          <div class="bar-message" id="agent-sticky-message">
+            <strong>זוהו 2 חריגות בבקשה:</strong> קריאת המונה שהוזנה (482) נמוכה מהקריאה הרשומה במערכת (495), ומסמך ת"ז סומן כדורש אימות.
+          </div>
+          <button class="btn-dismiss" onclick="document.getElementById('agent-sticky-bar').style.display='none'">✕</button>
+        </div>
+
+        <!-- Main Agent Grid: Side-by-Side Compare & Interactive Doc Viewer -->
+        <div class="agent-main-grid">
+
+          <!-- Left Column: Side-by-Side Data Comparison -->
+          <div class="compare-pane">
+            <div class="pane-header">
+              <h3>🔍 השוואת נתונים (Side-by-Side)</h3>
+              <span class="field-glow-legend">שדות זוהרים מעידים על אי-התאמה</span>
+            </div>
+
+            <div class="compare-table-wrapper">
+              <table class="compare-table">
+                <thead>
+                  <tr>
+                    <th>שדה בדיקה</th>
+                    <th>נתוני מערכת קיימים (תאגיד)</th>
+                    <th>נתוני הבקשה החדשה (נועה)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>שם המשלם</strong></td>
+                    <td class="sys-val">ישראל ישראלי (דייר יוצא)</td>
+                    <td class="req-val match">נועה לוי (דייר נכנס)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>מספר זהות</strong></td>
+                    <td class="sys-val">012345678</td>
+                    <td class="req-val match">039847125</td>
+                  </tr>
+                  <tr>
+                    <td><strong>כתובת הנכס</strong></td>
+                    <td class="sys-val">סוקולוב 42, הרצליה, דירה 7</td>
+                    <td class="req-val match">סוקולוב 42, הרצליה, דירה 7</td>
+                  </tr>
+                  <!-- Glowing Mismatch Field! -->
+                  <tr class="field-glow-row">
+                    <td><strong>קריאת מונה</strong></td>
+                    <td class="sys-val"><strong>495 מ"ק</strong> (חיוב אחרון)</td>
+                    <td class="req-val mismatch glow-cell">
+                      <strong>482 מ"ק</strong>
+                      <span class="mismatch-badge">חריגה: נמוך מהקודם!</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>מספר מד מים</strong></td>
+                    <td class="sys-val">WM-981240</td>
+                    <td class="req-val match">WM-981240 (תואם)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>נפשות בנכס</strong></td>
+                    <td class="sys-val">1 נפש</td>
+                    <td class="req-val">2 נפשות (כולל בגיר נוסף)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>מעמד הפונה</strong></td>
+                    <td class="sys-val">מחזיק רשום</td>
+                    <td class="req-val" id="agent-role-display">דייר נכנס</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right Column: Interactive Document Viewer -->
+          <div class="doc-viewer-pane">
+            <div class="pane-header">
+              <h3>📑 מציג מסמכים אינטראקטיבי</h3>
+              <div class="doc-tabs">
+                <button class="doc-tab active" onclick="DocViewer.switchDoc('meter')">מונה מים</button>
+                <button class="doc-tab" onclick="DocViewer.switchDoc('contract')">חוזה שכירות</button>
+                <button class="doc-tab" onclick="DocViewer.switchDoc('tz')">צילום ת"ז</button>
+              </div>
+            </div>
+
+            <!-- Doc Viewer Toolbar -->
+            <div class="viewer-toolbar">
+              <button class="tool-btn" onclick="DocViewer.zoomIn()" title="הגדל (Zoom In)">🔍+</button>
+              <button class="tool-btn" onclick="DocViewer.zoomOut()" title="הקטן (Zoom Out)">🔍-</button>
+              <button class="tool-btn" onclick="DocViewer.rotate()" title="סובב ב-90 מעלות">🔄 סובב</button>
+              <button class="tool-btn" id="tool-highlight" onclick="DocViewer.toggleHighlight()" title="סמן מרקר על המסמך">🖍️ מרקר הדגשה</button>
+              <button class="tool-btn" onclick="DocViewer.reset()" title="איפוס תצוגה">↩️ אפס</button>
+            </div>
+
+            <!-- Visual Document Canvas / Preview Stage -->
+            <div class="doc-viewport" id="doc-viewport">
+              <div class="doc-stage" id="doc-stage">
+                <!-- Mock visual rendered document -->
+                <div class="mock-doc" id="mock-doc-content">
+                  <div class="doc-watermark">MAST VERIFIED ARCHIVE</div>
+                  <div class="doc-inner" id="mock-doc-body">
+                    <!-- Injected by DocViewer JS -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="doc-info-bar">
+              <span id="doc-filename">קובץ: WaterMeter_Photo_482.jpg</span>
+              <span>סטטוס מסמך: נטען ללא שיהוי (Zero-Latency)</span>
+            </div>
+          </div>
+
+        </div><!-- /.agent-main-grid -->
+
+        <!-- Bottom Action Bar (Fixed at bottom) -->
+        <div class="agent-actionbar">
+          <div class="action-note">
+            <span>מוכן להחלטת נציג:</span>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn btn-success" onclick="AgentOps.approveApplication()">
+              ✔️ אישור והפקת מסמך
+            </button>
+            <button class="btn btn-warning" onclick="AgentOps.openMissingDocsModal()">
+              ⚠️ בקשת השלמה ממוקדת (SMS ללקוח)
+            </button>
+            <button class="btn btn-danger" onclick="AgentOps.escalateToAdmin()">
+              🛡️ העברה למנהל לבדיקה
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /.agent-workspace -->
+    </section>
+
+
+    <!-- ========================================================
+         VIEW 3: תצוגת מנהל המערכת (Ops Control Center)
+         ======================================================== -->
+    <section id="view-admin" class="view-section">
+      <div class="admin-control-center">
+
+        <!-- Top Monitoring Bar: 3 Key Exception KPIs -->
+        <div class="admin-kpi-bar">
+          <div class="kpi-card danger">
+            <div class="kpi-icon">⏳</div>
+            <div class="kpi-data">
+              <span class="kpi-label">חריגות זמן SLA</span>
+              <strong class="kpi-value" id="kpi-sla-count">3 פניות</strong>
+              <small class="kpi-sub">מעל 4 שעות ללא מענה</small>
+            </div>
+          </div>
+
+          <div class="kpi-card warning">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-data">
+              <span class="kpi-label">פניות ללא נציג בתור</span>
+              <strong class="kpi-value" id="kpi-unassigned-count">4 משימות</strong>
+              <small class="kpi-sub">ממתינות לחלוקת עומס</small>
+            </div>
+          </div>
+
+          <div class="kpi-card info">
+            <div class="kpi-icon">⚠️</div>
+            <div class="kpi-data">
+              <span class="kpi-label">כשלי העלאה ואימות</span>
+              <strong class="kpi-value" id="kpi-failures-count">2 אירועים</strong>
+              <small class="kpi-sub">דורשים התערבות טכנית</small>
+            </div>
+          </div>
+
+          <!-- Drawer Toggle Button -->
+          <button class="btn btn-outline-admin drawer-trigger" onclick="AdminOps.toggleDrawer(true)">
+            ⚙️ תפריט ניהול והרשאות
+          </button>
+        </div>
+
+        <!-- Global Action Bar -->
+        <div class="admin-global-actionbar">
+          <div class="bar-title">
+            <strong>⚡ פעולות אופרטיביות גורפות</strong>
+            <span>מענה מהיר לצווארי בקבוק</span>
+          </div>
+          <div class="bar-actions">
+            <button class="btn btn-primary btn-sm" onclick="AdminOps.autoAssignAll()">
+              🤖 הפעל שיוך אוטומטי לעומסים
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="AdminOps.unblockAll()">
+              🔓 פתיחה מחדש ושחרור חסימות גורף
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Exceptions Table (No-scroll, Calm UX) -->
+        <div class="admin-table-container">
+          <div class="table-header-title">
+            <h3>🚨 טבלת חריגות אקטיבית</h3>
+            <span class="live-counter">סה"כ 5 מקרים בטיפול ידני</span>
+          </div>
+
+          <div class="table-viewport-box">
+            <table class="exceptions-table">
+              <thead>
+                <tr>
+                  <th>מזהה אירוע</th>
+                  <th>סוג חריגה</th>
+                  <th>זמן המתנה</th>
+                  <th>סטטוס נוכחי</th>
+                  <th>נציג מטפל</th>
+                  <th>פעולה מהירה</th>
+                </tr>
+              </thead>
+              <tbody id="exceptions-table-body">
+                <!-- Dynamically populated from JS Store -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /.admin-control-center -->
+    </section>
+
+  </main>
+
+  <!-- ========================================================
+       MANAGEMENT DRAWER (Slides from Right in RTL - 30% width)
+       ======================================================== -->
+  <aside class="management-drawer" id="management-drawer">
+    <div class="drawer-header">
+      <h3>⚙️ ניהול משלים - מנהל מערכת</h3>
+      <button class="btn-close-drawer" onclick="AdminOps.toggleDrawer(false)">✕</button>
+    </div>
+
+    <div class="drawer-content">
+
+      <!-- Permissions & Connected Agents Control -->
+      <div class="drawer-section">
+        <h4>👥 בקרת נציגים והרשאות</h4>
+        <p class="section-desc">שינוי רמות הרשאה וניהול גישה בזמן אמת</p>
+        <div class="agents-list" id="drawer-agents-list">
+          <!-- Populated from Store -->
+        </div>
+      </div>
+
+      <!-- Audit Log & Security Events -->
+      <div class="drawer-section">
+        <h4>📜 יומן פעולות מנהל ואירועי אבטחה</h4>
+        <div class="drawer-audit-feed" id="drawer-audit-feed">
+          <!-- Populated from Store -->
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- Drawer Backdrop -->
+  <div class="drawer-backdrop" id="drawer-backdrop" onclick="AdminOps.toggleDrawer(false)"></div>
+
+
+  <!-- ========================================================
+       MODALS
+       ======================================================== -->
+
+  <!-- Modal 1: Missing Documents Request (Agent -> Customer) -->
+  <div class="modal-overlay" id="modal-missing-docs" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>✉️ שליחת בקשת השלמת מסמכים ללקוח</h3>
+        <button class="btn-close" onclick="App.closeModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>סמן את המסמכים החסרים שעל הלקוח להשלים. המערכת תשלח הודעת SMS ומייל ישירים לקישור ההשלמה:</p>
+        <div class="checkbox-list">
+          <label class="custom-check-item">
+            <input type="checkbox" value="צילום תעודת זהות לא ברור או חסר ספח" checked>
+            <span>צילום תעודת זהות לא ברור או חסר ספח</span>
+          </label>
+          <label class="custom-check-item">
+            <input type="checkbox" value="חסר עמוד חתימות בחוזה השכירות">
+            <span>חסר עמוד חתימות בחוזה השכירות</span>
+          </label>
+          <label class="custom-check-item">
+            <input type="checkbox" value="צילום מונה המים מטושטש או אינו תואם את הקריאה" checked>
+            <span>צילום מונה המים מטושטש או אינו תואם את הקריאה</span>
+          </label>
+          <label class="custom-check-item">
+            <input type="checkbox" value="נדרש ייפוי כוח מקורי וצילום תעודת זהות מיופה">
+            <span>נדרש ייפוי כוח מקורי וצילום תעודת זהות מיופה</span>
+          </label>
+        </div>
+        <div class="form-group" style="margin-top: 15px;">
+          <label>הערה חופשית לנציג:</label>
+          <textarea id="missing-custom-note" rows="2" class="form-control" placeholder="הסבר קצר שיופיע ללקוח במסך..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeModals()">ביטול</button>
+        <button class="btn btn-warning" onclick="AgentOps.sendMissingDocsRequest()">שלח SMS ובקש השלמה 📲</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Resubmit Document Modal (Noa Resubmission) -->
+  <div class="modal-overlay" id="modal-resubmit" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📤 העלאת מסמך חוזר להשלמה</h3>
+        <button class="btn-close" onclick="App.closeModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info">
+          המסמך הנדרש: <strong>צילום תעודת זהות ברור + ספח פתוח</strong>
+        </div>
+        <div class="file-dropzone" onclick="NoaWizard.confirmResubmit()">
+          <div class="drop-icon">📁</div>
+          <div class="drop-text">
+            <strong>לחץ לבחירת קובץ עדכני ותקין (JPG/PDF)</strong>
+            <span class="file-selected-text">קובץ חדש: ID_Noa_Levy_Clear.jpg מוכן להעלאה</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeModals()">ביטול</button>
+        <button class="btn btn-primary" onclick="NoaWizard.confirmResubmit()">שדר מסמך מעודכן לנציג 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Audit Log Modal (Full History) -->
+  <div class="modal-overlay" id="modal-audit" style="display:none;">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3>📋 יומן ביקורת ואירועי מערכת (Audit Log)</h3>
+        <button class="btn-close" onclick="App.closeModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="audit-history-list" id="full-audit-list">
+          <!-- Populated from JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeModals()">סגור</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Floating Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Script -->
+  <script src="app.js"></script>
+</body>
+</html>
